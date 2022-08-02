@@ -12,7 +12,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     public UserDaoHibernateImpl() {
     }
-
+    Transaction tx = null;
     @Override
     public void createUsersTable() {
         String CREATE_TABLE = "CREATE TABLE if not exists users " +
@@ -21,9 +21,9 @@ public class UserDaoHibernateImpl implements UserDao {
                 " lastName VARCHAR(70), " +
                 " age TINYINT, " +
                 " PRIMARY KEY ( id ))";
-        Session session = Util.getFactory().openSession();
-        Transaction tx = null;
-        try {
+
+
+        try (Session session = Util.getFactory().openSession()) {
             tx = session.beginTransaction();
             session.createSQLQuery(CREATE_TABLE).executeUpdate();
             tx.commit();
@@ -32,16 +32,12 @@ public class UserDaoHibernateImpl implements UserDao {
             if (tx != null) {
                 tx.rollback();
             }
-        } finally {
-            session.close();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        Session session = Util.getFactory().openSession();
-        Transaction tx = null;
-        try {
+        try (Session session = Util.getFactory().openSession()) {
             tx = session.beginTransaction();
             session.createSQLQuery("DROP TABLE IF EXISTS users").executeUpdate();
             session.getTransaction().commit();
@@ -50,16 +46,12 @@ public class UserDaoHibernateImpl implements UserDao {
             if (tx != null) {
                 tx.rollback();
             }
-        } finally {
-            session.close();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        Session session = Util.getFactory().openSession();
-        Transaction tx = null;
-        try {
+        try (Session session = Util.getFactory().openSession()) {
             tx = session.beginTransaction();
             session.save(new User(name, lastName, age));
             tx.commit();
@@ -69,16 +61,12 @@ public class UserDaoHibernateImpl implements UserDao {
             if (tx != null) {
                 tx.rollback();
             }
-        } finally {
-            session.close();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        Session session = Util.getFactory().openSession();
-        Transaction tx = null;
-        try {
+        try (Session session = Util.getFactory().openSession()) {
             tx = session.beginTransaction();
             User user = (User) session.get(User.class, id);
             if (user != null) {
@@ -90,17 +78,13 @@ public class UserDaoHibernateImpl implements UserDao {
             if (tx != null) {
                 tx.rollback();
             }
-        } finally {
-            session.close();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
         List<User> result = new ArrayList<>();
-        Session session = Util.getFactory().openSession();
-        Transaction tx = null;
-        try {
+        try (Session session = Util.getFactory().openSession()) {
             tx = session.beginTransaction();
             result = session.createQuery("FROM User").list();
             session.getTransaction().commit();
@@ -110,17 +94,13 @@ public class UserDaoHibernateImpl implements UserDao {
             if (tx != null) {
                 tx.rollback();
             }
-        } finally {
-            session.close();
         }
         return result;
     }
 
     @Override
     public void cleanUsersTable() {
-        Session session = Util.getFactory().openSession();
-        Transaction tx = null;
-        try {
+        try (Session session = Util.getFactory().openSession()) {
             tx = session.beginTransaction();
             session.createQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
@@ -129,8 +109,6 @@ public class UserDaoHibernateImpl implements UserDao {
             if (tx != null) {
                 tx.rollback();
             }
-        } finally {
-            session.close();
         }
     }
 }
